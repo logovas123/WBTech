@@ -1,1 +1,1 @@
-# WBTech
+# Курс WBTech
