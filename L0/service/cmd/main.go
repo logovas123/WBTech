@@ -10,16 +10,16 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load("../.env") // читаем env file
 	if err != nil {
 		slog.Error("error parse .env file")
 	}
 	slog.Info("parse .env file success")
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background()) // создаём контекст с закрытием, нужен для gracefull shutdown
 	defer cancel()
 
-	service, err := service.NewService()
+	service, err := service.NewService() // создаём новый сервис
 	if err != nil {
 		slog.Error("error create service:",
 			"error", err,
@@ -28,11 +28,12 @@ func main() {
 	}
 	slog.Info("service create success")
 
+	// стартуем сервис
 	if err = service.Start(ctx); err != nil {
 		slog.Error("error start service:",
 			"error", err,
 		)
 	}
 
-	slog.Info("service gracefull shutdown")
+	slog.Info("service gracefull shutdown") // здесь работа сервиса полностью завершается
 }

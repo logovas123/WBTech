@@ -7,9 +7,9 @@ import (
 )
 
 func NewMuxServer(orderHandler *OrderHandler) http.Handler {
-	r := mux.NewRouter()
+	r := mux.NewRouter() // создаём роутер
 
-	r.HandleFunc("/api/{id}", orderHandler.GetOrderByID).Methods(http.MethodGet)
+	r.HandleFunc("/api/{id}", orderHandler.GetOrderByID).Methods(http.MethodGet) // регистрируем обработчик
 
 	return r
 }

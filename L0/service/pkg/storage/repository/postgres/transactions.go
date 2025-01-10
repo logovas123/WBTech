@@ -9,12 +9,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// данная функция представляет собой транзакцию, т.к. в бд создано несколько таблиц, которые связаны друг с другом
+// транзакции гарантируют, что при обращении к каждой из таблиц, данные ни одной из таблиц не менялись
 func InsertOrder(ctx context.Context, pool *pgxpool.Pool, order model.Order) error {
-	tx, err := pool.Begin(ctx)
+	tx, err := pool.Begin(ctx) // создали транзакцию
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(ctx) // откат транзакции
 
 	orderQuery := `
 		INSERT INTO orders (
@@ -23,6 +25,7 @@ func InsertOrder(ctx context.Context, pool *pgxpool.Pool, order model.Order) err
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	`
 
+	// вставляем записи в каждую из таблиц
 	_, err = tx.Exec(ctx, orderQuery,
 		order.OrderUID, order.TrackNumber, order.Entry, order.Locale, order.InternalSignature,
 		order.CustomerID, order.DeliveryService, order.ShardKey, order.SmID, order.DateCreated, order.OofShard,
@@ -75,6 +78,7 @@ func InsertOrder(ctx context.Context, pool *pgxpool.Pool, order model.Order) err
 		}
 	}
 
+	// завершаем транзакцию
 	if err = tx.Commit(ctx); err != nil {
 		return err
 	}
@@ -82,9 +86,11 @@ func InsertOrder(ctx context.Context, pool *pgxpool.Pool, order model.Order) err
 	return nil
 }
 
+// получаем заказ по id
 func GetOrderByUID(ctx context.Context, pool *pgxpool.Pool, orderUID string) (*model.Order, error) {
 	var order model.Order
 
+	// получаем запись в каждой из таблиц
 	err := pool.QueryRow(ctx, `
 		SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
 		FROM orders
@@ -203,15 +209,16 @@ func GetOrderByUID(ctx context.Context, pool *pgxpool.Pool, orderUID string) (*m
 	return &order, nil
 }
 
+// функция удаления записи
 func DeleteOrderByUID(ctx context.Context, pool *pgxpool.Pool, orderUID string) error {
-	tx, err := pool.Begin(ctx)
+	tx, err := pool.Begin(ctx) // создаём транзакцию
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(ctx) // завершаем транзакцию
 
 	query := `DELETE FROM orders WHERE order_uid = $1`
-	_, err = pool.Exec(ctx, query, orderUID)
+	_, err = pool.Exec(ctx, query, orderUID) // запись будет удалена во всех таблицах
 	if err != nil {
 		return err
 	}
