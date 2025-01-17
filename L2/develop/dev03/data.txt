@@ -1,0 +1,5 @@
+10 cat
+2 dog
+8 bird
+5 fish
+20 apple

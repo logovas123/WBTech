@@ -1,0 +1,7 @@
+This is a test file.
+Hello, this is a simple file.
+This is another line.
+Test line to match.
+Random line.
+Match found here.
+End of the test file.
