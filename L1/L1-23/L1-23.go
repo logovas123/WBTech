@@ -8,6 +8,7 @@ func main() {
 	fmt.Println(sl)
 }
 
+// удалить элемент из слайса можно только следующим способом через append
 func deleteElemFromSlice(sl []int, ind int) []int {
 	return append(sl[:ind], sl[ind+1:]...)
 }

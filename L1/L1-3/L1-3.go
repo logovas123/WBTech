@@ -7,13 +7,14 @@ import (
 )
 
 func main() {
+	// задачу можно решить через мьютексы или через атомики
 	TotalMutex()
-	// TotalAtomic()
+	TotalAtomic()
 }
 
 func TotalMutex() {
-	wg := sync.WaitGroup{}
-	mx := &sync.Mutex{}
+	wg := sync.WaitGroup{} // для ожидания завершения всех горутин
+	mx := &sync.Mutex{}    // мьютекс нужен для избежания конкурентного доступа к переменнойц total
 	var total int
 
 	array := [5]int{2, 4, 6, 8, 10}
@@ -22,12 +23,12 @@ func TotalMutex() {
 		wg.Add(1)
 		go func(v int) {
 			defer wg.Done()
-			mx.Lock()
+			mx.Lock() // лочим мьютекс избегая конкурентного доступа к total
 			total += v * v
 			mx.Unlock()
 		}(v)
 	}
-	wg.Wait()
+	wg.Wait() // ждём все горутины
 	fmt.Println(total)
 }
 
@@ -41,7 +42,7 @@ func TotalAtomic() {
 		wg.Add(1)
 		go func(v int64) {
 			defer wg.Done()
-			atomic.AddInt64(&total, int64(v*v))
+			atomic.AddInt64(&total, v*v) // каждая горутина атомарно прибавляет к total квардат числа
 		}(v)
 	}
 	wg.Wait()

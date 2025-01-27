@@ -14,6 +14,8 @@ func main() {
 	fmt.Printf("%s - %s\n", str, newStr)
 }
 
+// разбиваем предложение на слайс строк (разделитель пробел)
+// и итерируемся в обратном порядке
 func GetNewStr(s string) string {
 	sliceStr := strings.Split(s, " ")
 
@@ -22,5 +24,5 @@ func GetNewStr(s string) string {
 		result[len(sliceStr)-1-i] = sliceStr[i]
 	}
 
-	return strings.Join(result, " ")
+	return strings.Join(result, " ") // снова соединяем в общее предложение
 }

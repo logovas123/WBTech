@@ -27,6 +27,7 @@ func main() {
 	signal.Notify(sigChannel, os.Interrupt)
 	defer signal.Stop(sigChannel)
 
+	// graceful shutdown
 	go func() {
 		<-sigChannel
 		fmt.Println("get signal of complete")
@@ -35,8 +36,9 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 
-	structCount := newCounterStruct()
+	structCount := newCounterStruct() // создали структуру счётчик
 
+	// запускаем пачку горутин
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go incrementCounter(ctx, wg, structCount)
@@ -47,6 +49,8 @@ func main() {
 	fmt.Println("counter =", structCount.counter)
 }
 
+// в бесконечном цикле инкрементируем счётик, лучше всего это делать с помощью пакета атомик
+// слишком жирно выделять на инкремент целый мьютекс
 func incrementCounter(ctx context.Context, wg *sync.WaitGroup, c *counterStruct) {
 	defer wg.Done()
 	for {
@@ -55,7 +59,7 @@ func incrementCounter(ctx context.Context, wg *sync.WaitGroup, c *counterStruct)
 			return
 		default:
 			atomic.AddInt64(&c.counter, 1)
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }

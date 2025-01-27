@@ -6,11 +6,12 @@ func main() {
 	data := []interface{}{1, "str", false, make(chan interface{}), struct{}{}}
 	for i, v := range data {
 		fmt.Printf("value %v: ", i+1)
-		do(v)
+		typeAssertion(v)
 	}
 }
 
-func do(i interface{}) {
+// в go есть так называемый type assertion который позволяет привести значение типа interface{} к определённому типу
+func typeAssertion(i interface{}) {
 	switch i.(type) {
 	case int:
 		fmt.Println("This is int!")
